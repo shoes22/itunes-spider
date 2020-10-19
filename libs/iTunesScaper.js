@@ -1,6 +1,8 @@
 const axios = require("axios").default;
 const cheerio = require("cheerio");
 const _ = require("lodash")
+let Parser = require('rss-parser');
+let rssParser = new Parser();
 
 class iTunesScaper {
   constructor() {
@@ -39,6 +41,7 @@ class iTunesScaper {
 
         for(let k = 0; k < this.pages.length; k++) {
           let pageLink = this.pages[k];
+          console.log(`---> ${pageLink}`)
           await this.writeToFile(pageLink)
           //const podcasts = await this.getPodcastLinks(pageLink);
           //this.podcasts = [...this.podcasts, ...podcasts];
@@ -49,8 +52,27 @@ class iTunesScaper {
     this.currentPageNumber = null;
     this.pageNumberLinks = [];  
     this.pages = [];
-    return this.podcasts.length;
+    console.log('done yeah')
   } 
+
+  parsePopularPodcasts = async () => {
+    const html = await this.fetchHtml(this.url);
+    const selector = cheerio.load(html);
+    const searchResults = selector("body").find("#genre-nav > .grid3-column > ul > li > a")
+    
+    // get all categories
+    const links = searchResults.map((idx, el) => {
+      const elementSelector = selector(el);
+      const link = elementSelector.attr("href").trim();
+      return link
+    }).get()
+
+    for(let i = 0; i < links.length; i++) {
+      const pageLink = links[i];
+      console.log(pageLink)      
+      await this.writeToFile(pageLink)
+    }
+  }
 
   // private methods
   writeToFile = async (url) => {
@@ -63,20 +85,24 @@ class iTunesScaper {
       const link = elementSelector.attr("href").trim();
       return link
     }).get()
+
+    console.log(`importing total: ${links.length} podcasts`);
     
     const reg = new RegExp(/(.*)(\/)(id)(\d*)/);
 
-    const podcasts = links.map((link) => {
+    const csvData = []
+    
+    for(let i = 0; i < links.length; i++) {   
+      const link = links[i];   
       const parsed = reg.exec(link);
       if(parsed) {
         const id = parsed[4];
-        return {link, id}
-      } else {
-        return {link, id: null}
+        // return {link, id}
+        const podcast = await this._getInfoFromiTunesApi(id);
+        csvData.push({...podcast, id, link});
       }
-    }) 
+    }
 
-    const csvData = podcasts.filter((podcast) => podcast.link !== null);
     if(this.csvFile) {
       try {
         await this.csvFile.append(csvData)
@@ -180,6 +206,44 @@ class iTunesScaper {
       );
     }
   };
+
+  _getInfoFromiTunesApi = async (id) => {
+    const endpoint = `https://itunes.apple.com/lookup?id=${id}`;
+    const { data } = await axios.get(endpoint);
+    
+    if(data.resultCount > 0) {
+      const {artistName, trackName, trackCount, genreIds, genres, feedUrl, releaseDate } = data.results[0];
+      console.log(`> ${trackName}`)
+      const genreIdsStr = JSON.stringify(genreIds);
+      const genresStr = JSON.stringify(genres);
+      try {
+        const feedData = await this._getInfoFromRSS(feedUrl);
+        const {email, firstReleaseDate, language} = feedData;      
+        return {artistName, trackName, trackCount, genreIds: genreIdsStr, genres: genresStr, feedUrl, email, firstReleaseDate, language, releaseDate }
+      } catch (err) {
+        return {artistName, trackName, trackCount, genreIds: genreIdsStr, genres: genresStr, feedUrl, releaseDate}
+      }
+
+    }
+    return null;
+  }
+
+  _getInfoFromRSS = async (feedUrl) => {
+    let feed = await rssParser.parseURL(feedUrl);
+    const {items, language, itunes} = feed;
+    const owner = itunes.owner;
+    let email = null;
+    if(owner && owner.email) {
+      email = owner.email;
+    }
+    let firstReleaseDate = null;
+    if(items.length > 1) {
+      firstReleaseDate = items[items.length - 1]['date']
+    }
+
+    return {email, firstReleaseDate, language}
+    // console.log(feed.);
+  }
 
 }
 
