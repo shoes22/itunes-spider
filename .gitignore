@@ -1,6 +1,7 @@
 node_modules
 node_modules_linux
 .env
+Dockerfile-run
 
 # Compiled Dirs (http://nodejs.org/api/addons.html)
 build/
