@@ -1,0 +1,26 @@
+{
+  "name": "itunes-spider",
+  "version": "1.0.0",
+  "description": "itunes podcast directory scraper",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/app.js",
+    "dev": "nodemon --exec node server/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "josh chen",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.20.0",
+    "bluebird": "^3.7.2",
+    "body-parser": "^1.19.0",
+    "cheerio": "^1.0.0-rc.3",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "fast-csv": "^4.3.2",
+    "https": "^1.0.0",
+    "lodash": "^4.17.20",
+    "morgan": "^1.10.0",
+    "request": "^2.88.2"
+  }
+}

@@ -1,0 +1,14 @@
+node_modules
+node_modules_linux
+# .env
+
+# Compiled Dirs (http://nodejs.org/api/addons.html)
+build/
+/dist/bundle.js
+
+# Logs
+logs
+*.log
+
+# tmp
+/tmp/itunes.csv
