@@ -15,14 +15,14 @@ const parseAll = async () => {
 
   fs.closeSync(fs.openSync(path.resolve(__dirname, filePath), 'w'))
 
-  // const scaper = new scapers.iTunesScaper();  
-  // const csvFile = new scapers.CsvFile({
-  //   path: path.resolve(__dirname, filePath),
-  //   headers: ['id', 'link','feedUrl', 'trackName', 'author', 'trackCount', 'primaryGenreName', 'genres', 'releaseDate', 'email', 'language', 'firstReleaseDate'],
-  // })
+  const scaper = new scapers.iTunesScaper();  
+  const csvFile = new scapers.CsvFile({
+    path: path.resolve(__dirname, filePath),
+    headers: ['id', 'link','feedUrl', 'trackName', 'author', 'trackCount', 'primaryGenreName', 'genres', 'releaseDate', 'email', 'language', 'firstReleaseDate'],
+  })
 
-  // scaper.csvFile = csvFile;
-  // await scaper.parsePopularPodcasts();
+  scaper.csvFile = csvFile;
+  await scaper.parsePopularPodcasts();
 
   try {
     const uploadFileName = `itunes-${Date.now()}.csv`
