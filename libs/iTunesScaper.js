@@ -212,16 +212,16 @@ class iTunesScaper {
     const { data } = await axios.get(endpoint);
     
     if(data.resultCount > 0) {
-      const {artistName, trackName, trackCount, genreIds, genres, feedUrl, releaseDate } = data.results[0];
+      const {artistName, trackName, trackCount, genreIds, genres, feedUrl, releaseDate, primaryGenreName } = data.results[0];
       console.log(`> ${trackName}`)
       const genreIdsStr = JSON.stringify(genreIds);
       const genresStr = JSON.stringify(genres);
       try {
         const feedData = await this._getInfoFromRSS(feedUrl);
         const {email, firstReleaseDate, language} = feedData;      
-        return {artistName, trackName, trackCount, genreIds: genreIdsStr, genres: genresStr, feedUrl, email, firstReleaseDate, language, releaseDate }
+        return {artistName, trackName, trackCount, primaryGenreName, genreIds: genreIdsStr, genres: genresStr, feedUrl, email, firstReleaseDate, language, releaseDate }
       } catch (err) {
-        return {artistName, trackName, trackCount, genreIds: genreIdsStr, genres: genresStr, feedUrl, releaseDate}
+        return {artistName, trackName, trackCount, primaryGenreName, genreIds: genreIdsStr, genres: genresStr, feedUrl, releaseDate}
       }
 
     }

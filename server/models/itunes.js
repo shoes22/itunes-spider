@@ -18,7 +18,7 @@ const parseAll = async () => {
   const scaper = new scapers.iTunesScaper();  
   const csvFile = new scapers.CsvFile({
     path: path.resolve(__dirname, filePath),
-    headers: ['id', 'link','feedUrl', 'trackName', 'author', 'trackCount', 'primaryGenreName', 'genres', 'releaseDate', 'email', 'language', 'firstReleaseDate'],
+    headers: ['id', 'link','feedUrl', 'trackName', 'artistName', 'trackCount', 'primaryGenreName', 'genres', 'releaseDate', 'email', 'language', 'firstReleaseDate'],
   })
 
   scaper.csvFile = csvFile;
