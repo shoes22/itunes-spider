@@ -1,0 +1,15 @@
+diff --git a/node_modules/node-fetch/lib/index.js b/node_modules/node-fetch/lib/index.js
+index 45d3985..d8b2bf5 100644
+--- a/node_modules/node-fetch/lib/index.js
++++ b/node_modules/node-fetch/lib/index.js
+@@ -270,7 +270,9 @@ Body.prototype = {
+ 			try {
+ 				return JSON.parse(buffer.toString());
+ 			} catch (err) {
+-				return Body.Promise.reject(new FetchError(`invalid json response body at ${_this2.url} reason: ${err.message}`, 'invalid-json'));
++				console.log(err);
++				//return Body.Promise.reject(new FetchError(`invalid json response body at ${_this2.url} reason: ${err.message}`, 'invalid-json'));
++				return buffer.toString();
+ 			}
+ 		});
+ 	},

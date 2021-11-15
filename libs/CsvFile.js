@@ -1,10 +1,11 @@
 const fs = require('fs');
-const csv = require('@fast-csv/format');
+const csvParse = require('@fast-csv/parse');
+const csvFormat = require('@fast-csv/format');
 
 class CsvFile {
   static write(filestream, rows, options) {
       return new Promise((res, rej) => {
-          csv.writeToStream(filestream, rows, options)
+          csvFormat.writeToStream(filestream, rows, options)
               .on('error', err => rej(err))
               .on('finish', () => res());
       });
@@ -37,6 +38,17 @@ class CsvFile {
               return res(contents);
           });
       });
+  }
+
+  readCsv() {
+    const data = [];
+    return new Promise((resolutionFunc,rejectionFunc) => {
+      fs.createReadStream(this.path)
+      .pipe(csvParse.parse({ignoreEmpty: true}))
+      .on('error', error => rejectionFunc(error))
+      .on('data', row => data.push(row))
+      .on('end', rowCount => resolutionFunc(data));
+    });
   }
 }
 

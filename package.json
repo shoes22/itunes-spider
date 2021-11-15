@@ -4,15 +4,16 @@
   "description": "itunes podcast directory scraper",
   "main": "index.js",
   "scripts": {
-    "start": "node server/app.js",
+    "start": "node --tls-min-v1.1 server/app.js",
     "dev": "nodemon --exec node server/app.js",
+    "postinstall": "patch-package",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "josh chen",
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.773.0",
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
     "cheerio": "^1.0.0-rc.3",
@@ -21,7 +22,11 @@
     "fast-csv": "^4.3.2",
     "https": "^1.0.0",
     "lodash": "^4.17.20",
+    "mongodb": "^4.0.0",
     "morgan": "^1.10.0",
+    "node-fetch": "^2.6.6",
+    "node-libcurl": "^2.3.3",
+    "parse-link-header": "^1.0.1",
     "request": "^2.88.2",
     "rss-parser": "^3.9.0"
   }

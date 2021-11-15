@@ -1,25 +1,37 @@
 const axios = require("axios").default;
 const cheerio = require("cheerio");
 const _ = require("lodash")
+//const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
 let Parser = require('rss-parser');
 let rssParser = new Parser();
+const url = 'mongodb://exander05:zuDhuc-fogbyk-4qexge@localhost:27017';
+const dbName = 'podcast_data';
 
 class iTunesScaper {
   constructor() {
-    this.url = "https://podcasts.apple.com/us/genre/podcasts/id26";
+    this.url = "https://chartable.com/charts/chartable";
     this.top_url = "";
     this.csvFile = null,
+    this.db = null,
+    this.client = null;
     this.currentPageNumber = null;
     this.pageNumberLinks = [];
     this.pages = [];
     this.podcasts = [];
+    this.top_links = ['https://chartable.com/charts/chartable/podcast-global-all-podcasts-reach'];
+
+    /*MongoClient.connect(url, function(err, client) {
+      assert.equal(null, err);
+      console.log("Connected successfully to server");
+    });*/
   }
 
   parse = async () => {
     const html = await this.fetchHtml(this.url);
     const selector = cheerio.load(html);
     const searchResults = selector("body").find("#genre-nav > .grid3-column > ul > li > a")
-    
+
     // get all categories
     const links = searchResults.map((idx, el) => {
       const elementSelector = selector(el);
@@ -34,7 +46,7 @@ class iTunesScaper {
         // each letter, get page numbers
         console.log(`> ${letterLinks[j]}`)
         this.currentPageNumber = null;
-        this.pageNumberLinks = [];        
+        this.pageNumberLinks = [];
         await this.getPageNumberLinks(letterLinks[j]);
         let pagelinks = this.pageNumberLinks.map((item) => item.link )
         this.pages = _.uniq(pagelinks);
@@ -50,18 +62,24 @@ class iTunesScaper {
     }
 
     this.currentPageNumber = null;
-    this.pageNumberLinks = [];  
+    this.pageNumberLinks = [];
     this.pages = [];
     console.log('done yeah')
-  } 
+  }
 
   parsePopularPodcasts = async () => {
-    const html = await this.fetchHtml(this.url);
-    const selector = cheerio.load(html);
-    const searchResults = selector("body").find("#genre-nav > .grid3-column > ul > li > a")
-    
+    for (let i = 0; i < this.top_links.length; i++) {
+      const html = await this.fetchHtml(this.top_links[i]);
+      const selector = cheerio.load(html);
+      const searchResults = selector("table").find("tr > td[3] > div > a");
+      console.log(searchResults);
+
+    }
+
+
+
     // get all categories
-    const links = searchResults.map((idx, el) => {
+    /*const links = searchResults.map((idx, el) => {
       const elementSelector = selector(el);
       const link = elementSelector.attr("href").trim();
       return link
@@ -69,9 +87,9 @@ class iTunesScaper {
 
     for(let i = 0; i < links.length; i++) {
       const pageLink = links[i];
-      console.log(pageLink)      
+      console.log(pageLink)
       await this.writeToFile(pageLink)
-    }
+    }*/
   }
 
   // private methods
@@ -87,13 +105,13 @@ class iTunesScaper {
     }).get()
 
     console.log(`importing total: ${links.length} podcasts`);
-    
+
     const reg = new RegExp(/(.*)(\/)(id)(\d*)/);
 
     const csvData = []
-    
-    for(let i = 0; i < links.length; i++) {   
-      const link = links[i];   
+
+    for(let i = 0; i < links.length; i++) {
+      const link = links[i];
       const parsed = reg.exec(link);
       if(parsed) {
         const id = parsed[4];
@@ -123,7 +141,7 @@ class iTunesScaper {
       const link = elementSelector.attr("href").trim();
       return link
     }).get()
-    
+
     const reg = new RegExp(/(.*)(\/)(id)(\d*)/);
 
     const podcasts = links.map((link) => {
@@ -138,7 +156,7 @@ class iTunesScaper {
 
     return podcasts.filter((podcast) => podcast.link !== null);
   }
-  
+
   getCategoryAlphaLinks = async (url) => {
     const html = await this.fetchHtml(url);
     const selector = cheerio.load(html);
@@ -149,17 +167,17 @@ class iTunesScaper {
       return link
       // return selector.attr("href").trim();
     }).get()
-    
+
     return links
   }
 
   getPageNumberLinks = async (url) => {
     try {
-      const links = await this._getPageNumberLinks(url);    
+      const links = await this._getPageNumberLinks(url);
       this.pageNumberLinks = [...this.pageNumberLinks, ...links];
       const lastLink = links[links.length-1];
-      const lastLinkPageNumber = lastLink.text;  
-      const lastLinkUrl = lastLink.link;    
+      const lastLinkPageNumber = lastLink.text;
+      const lastLinkUrl = lastLink.link;
       if(lastLinkPageNumber !== this.currentPageNumber) {
         this.currentPageNumber = lastLinkPageNumber;
         await this.getPageNumberLinks(lastLinkUrl);
@@ -180,9 +198,9 @@ class iTunesScaper {
     const html = await this.fetchHtml(url);
     const selector = cheerio.load(html);
     const searchResults = selector("body").find("#selectedgenre > ul.paginate > li > a");
-    
-    const links = searchResults.map((idx, el) => {    
-      const elementSelector = selector(el);  
+
+    const links = searchResults.map((idx, el) => {
+      const elementSelector = selector(el);
       const link = elementSelector.attr("href").trim();
       const text = elementSelector.text().trim();
       return {text, link}
@@ -210,7 +228,7 @@ class iTunesScaper {
   _getInfoFromiTunesApi = async (id) => {
     const endpoint = `https://itunes.apple.com/lookup?id=${id}`;
     const { data } = await axios.get(endpoint);
-    
+
     if(data.resultCount > 0) {
       const {artistName, trackName, trackCount, genreIds, genres, feedUrl, releaseDate, primaryGenreName } = data.results[0];
       console.log(`> ${trackName}`)
@@ -218,7 +236,7 @@ class iTunesScaper {
       const genresStr = JSON.stringify(genres);
       try {
         const feedData = await this._getInfoFromRSS(feedUrl);
-        const {email, firstReleaseDate, language} = feedData;      
+        const {email, firstReleaseDate, language} = feedData;
         return {artistName, trackName, trackCount, primaryGenreName, genreIds: genreIdsStr, genres: genresStr, feedUrl, email, firstReleaseDate, language, releaseDate }
       } catch (err) {
         return {artistName, trackName, trackCount, primaryGenreName, genreIds: genreIdsStr, genres: genresStr, feedUrl, releaseDate}

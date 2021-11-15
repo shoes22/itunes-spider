@@ -1,5 +1,5 @@
-const iTunesModel = require('./itunes');
+const chartableModel = require('./chartable');
 
 module.exports = {
-  iTunes: iTunesModel
+  chartable: chartableModel
 }
