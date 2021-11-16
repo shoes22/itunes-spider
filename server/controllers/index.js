@@ -11,9 +11,8 @@ const home = (req, res) => {
 const websub = async (req, res) => {
   console.log(req.query);
   if (req.query['hub.challenge']) {
+    const mongo = req.app.get('mongo');
     let expiryTime = 0;
-    const mongo = new scapers.mongo();
-    await mongo.connect('podcasts');
     if (req.query['hub.lease_seconds']) {
       const leaseMilliseconds = req.query['hub.lease_seconds'] * 1000;
       expiryTime = parseInt((Date.now() + leaseMilliseconds - 10800000) / 1000); //Get UNIX timestamp of expiry time, minus 3 hours.
@@ -22,6 +21,7 @@ const websub = async (req, res) => {
     //await mongo.findPodcast(req.query['hub.topic'])
     res.send(req.query['hub.challenge']);
   } else if (req.header('link')) {
+    const mongo = req.app.get('mongo');
     const parsedLinkHeader = parseLinkHeader(req.header('link'));
     console.log(parsedLinkHeader);
     if (parsedLinkHeader?.self?.url) {
