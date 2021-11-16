@@ -18,14 +18,14 @@ const websub = async (req, res) => {
       const leaseMilliseconds = req.query['hub.lease_seconds'] * 1000;
       expiryTime = parseInt((Date.now() + leaseMilliseconds - 10800000) / 1000); //Get UNIX timestamp of expiry time, minus 3 hours.
     }
-    await mongo.findAndUpdateWebSubPodcast(req.query['hub.topic'], expiryTime);
+    await mongo.findAndUpdateWebSubSubscription(req.query['hub.topic'], expiryTime);
     //await mongo.findPodcast(req.query['hub.topic'])
     res.send(req.query['hub.challenge']);
   } else if (req.header('link')) {
     const parsedLinkHeader = parseLinkHeader(req.header('link'));
     console.log(parsedLinkHeader);
     if (parsedLinkHeader?.self?.url) {
-
+      await mongo.findAndUpdateWebSubPodcast(parsedLinkHeader.self.url)
     }
     res.send('Link received Successfully!');
   } else {
