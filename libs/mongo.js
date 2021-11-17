@@ -46,9 +46,6 @@ class mongo {
       projection: { _id: 1, id: 1 },
     };
     const update = { hasRealtimeUpdates: true, pullNow: 1, updateType: "websub" };
-    if (expiryTime) {
-      update['webSubExpiryTime'] = expiryTime;
-    }
     return await this.collection.updateMany(query, {$set: update}, options);
   }
 
