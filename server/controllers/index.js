@@ -1,7 +1,7 @@
 const chartableContorller = require('./chartable');
 const path = require('path');
-const scapers = require('../../libs');
 const parseLinkHeader = require('parse-link-header');
+const models = require('../models');
 
 const home = (req, res) => {
   // find all
@@ -33,8 +33,15 @@ const websub = async (req, res) => {
   }
 }
 
+const checkAndUpdateFeed = async (req, res) => {
+  const results = await models.ingest.checkSingleFeed(req.body.url);
+  const hasUpdate = results ? false : true;
+  res.send(hasUpdate);
+}
+
 module.exports = {
   chartable: chartableContorller,
   home,
-  websub
+  websub,
+  checkAndUpdateFeed
 }

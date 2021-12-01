@@ -1,5 +1,7 @@
 const chartableModel = require('./chartable');
+const ingestModel = require('./ingest');
 
 module.exports = {
-  chartable: chartableModel
+  chartable: chartableModel,
+  ingest: ingestModel
 }

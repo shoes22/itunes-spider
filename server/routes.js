@@ -9,6 +9,7 @@ router.get('/v1/notify-sub', controllers.websub);
 router.post('/v1/notify-sub', controllers.websub);
 router.get('/v1/submit-url', controllers.home);
 router.post('/v1/add-rss', controllers.chartable.addRSS);
+router.post('/v1/check-url', controllers.checkAndUpdateFeed);
 
 //router.put('/v1/top_itunes_100', controllers.iTunes.put);
 router.get('/v1/test', controllers.chartable.testUrl);
