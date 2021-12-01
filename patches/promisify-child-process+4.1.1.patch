@@ -1,0 +1,13 @@
+diff --git a/node_modules/promisify-child-process/index.cjs b/node_modules/promisify-child-process/index.cjs
+index be02080..fd28ae5 100644
+--- a/node_modules/promisify-child-process/index.cjs
++++ b/node_modules/promisify-child-process/index.cjs
+@@ -67,7 +67,7 @@ function promisifyChildProcess(child, options = {}) {
+     function done(code, signal) {
+       if (!error) {
+         if (code != null && code !== 0) {
+-          error = new Error(`Process exited with code ${code}`);
++          //error = new Error(`Process exited with code ${code}`);
+         } else if (signal != null) {
+           error = new Error(`Process was killed with ${signal}`);
+         }
