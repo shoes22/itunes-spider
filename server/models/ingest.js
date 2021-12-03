@@ -26,7 +26,7 @@ const checkSingleFeed = async (url) => {
   console.log('finished running aggrivate');
   if (!codeResult) {
     console.log("Running partytime for " + url);
-    await runBashScript('partytime', 'partytime', url);
+    codeResult = await runBashScript('partytime', 'partytime', url);
     console.log('finished running partytime');
   }
   return codeResult;
