@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node --tls-min-v1.1 server/app.js",
     "dev": "nodemon --exec node server/app.js",
-    "postinstall": "patch-package",
+    "postinstall": "npx patch-package",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "josh chen",
@@ -25,7 +25,7 @@
     "mongodb": "^4.0.0",
     "morgan": "^1.10.0",
     "node-fetch": "^2.6.6",
-    "node-libcurl": "^2.3.3",
+    "node-libcurl": "^4.0.0",
     "parse-link-header": "^1.0.1",
     "promisify-child-process": "^4.1.1",
     "request": "^2.88.2",

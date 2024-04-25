@@ -81,13 +81,20 @@ class mongo {
     };
     const returnOne = await this.collection.findOneAndUpdate(query, {$set: update}, options);
 
-    if (returnOne.value || !iTunesId) {
+    if (returnOne.value) {
       return returnOne;
-    } else if (url){
-      query = {itunesId: parseInt(iTunesId)};
-      update['url'] = url;
-      return await this.collection.findOneAndUpdate(query, {$set: update}, options);
     } else {
+      if (url) {
+        query = {originalUrl: url};
+        const returnTwo = await this.collection.findOneAndUpdate(query, {$set: update}, options);
+        if (returnTwo.value) {
+          return returnTwo;
+        }
+      }
+      if (iTunesId) {
+        query = {itunesId: parseInt(iTunesId)};
+        return await this.collection.findOneAndUpdate(query, {$set: update}, options);
+      }
       return returnOne;
     }
   }

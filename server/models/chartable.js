@@ -116,9 +116,13 @@ const update = async (results, chartType, shouldPullNow) => {
     if (podcast.value) {
       count++;
     } else {
-      console.log('#' + total + ': ' + data[1] + ' (' + data[0] + ')');
-      const submitResult = await submitURL(data[0], iTunesId);
-      console.log(submitResult);
+      console.log('#' + total + ': ' + data[1] + ' (' + data[0] + ') -' + iTunesId);
+      if (data[0].length) {
+        const submitResult = await submitURL(data[0], iTunesId);
+        console.log(submitResult);
+      } else {
+        console.log("URL empty, doing nothing.");
+      }
       const csvData = [];
       csvData.push(data);
       await csvFile.append(csvData);
