@@ -1,55 +1,90 @@
 <head>
   <title>Podopolo Ingest Test</title>
-  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-  <link href="/styles.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script>
+  <link
+    href="https://fonts.googleapis.com/css?family=Roboto"
+    rel="stylesheet"
+  />
+  <link href="/styles.css" rel="stylesheet" />
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+    integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+    crossorigin="anonymous"
+  ></script>
 </head>
 
 <body>
   <header>
     <nav>
-      <ul id="nav_bar">
-
-      </ul>
+      <ul id="nav_bar"></ul>
     </nav>
   </header>
 
   <!-- GOOGLE IMG -->
   <div class="google">
-    <a href="#" id="google_logo"><img src="/festisite_google.png" alt="photo" style="width: 350px;"/></a>
+    <a href="#" id="google_logo"
+      ><img src="/festisite_google.png" alt="photo" style="width: 350px"
+    /></a>
   </div>
 
-  <pre id="result" style="text-align: center;"></pre>
+  <pre id="result" style="text-align: center"></pre>
 
   <!-- FORM SEARCH -->
   <div class="form">
-    <form id="searchForm">
+    <form id="submitForm">
       <label for="form-search"></label>
-      <input type="text" autocomplete="off" name="rss_url" id="rss_url" placeholder="Submit url here...">
-      <input type="text" autocomplete="off" name="itunes_id" id="itunes_id" placeholder="iTunes ID">
+      <input
+        type="text"
+        autocomplete="off"
+        id="form-search"
+        placeholder="Search our database of 5,536,368 podcasts and counting!"
+      />
+      <input
+        type="text"
+        autocomplete="off"
+        name="rss_url"
+        id="rss_url"
+        placeholder="Submit url here..."
+      />
+      <input
+        type="text"
+        autocomplete="off"
+        name="itunes_id"
+        id="itunes_id"
+        placeholder="iTunes ID"
+      />
 
       <!-- BUTTONS -->
-      <div class= "buttons">
-        <input type="submit" value="Search Podcasts" id="google_search">
-        <button id="im_feeling_lucky" style="display: none;">Search People</button>
+      <div class="buttons">
+        <input type="submit" value="Submit Podcast" />
+        <button id="google_search">Search Podcasts</button>
+        <button id="im_feeling_lucky">Search People</button>
       </div>
     </form>
   </div>
 
   <!-- FOOTER -->
   <script type="text/javascript">
-    fetch('https://blog.podopolo.com/feed/atom/')
+    /*fetch('https://blog.podopolo.com/feed/atom/')
       .then(response => response.json())
-      .then(data => console.log(data));
-    $('#searchForm').submit(function(e){
+      .then(data => console.log(data));*/
+    $("#google_search").click(function (e) {
+      e.preventDefault();
+      const searchField = encodeURIComponent($("#form-search").val());
+      window.location.href = "/results.html?byTerm=" + searchField;
+    });
+    $("#im_feeling_lucky").click(function (e) {
+      e.preventDefault();
+      const searchField = encodeURIComponent($("#form-search").val());
+      window.location.href = "/results.html?byPerson=" + searchField;
+    });
+    $("#submitForm").submit(function (e) {
       e.preventDefault();
       $.ajax({
         method: "POST",
         url: "/v1/add-rss",
-        data: { url: $('#rss_url').val(), itunesId: $('#itunes_id').val() }
-      })
-      .done(function( msg ) {
-        $('#result').append(JSON.stringify(msg));
+        data: { url: $("#rss_url").val(), itunesId: $("#itunes_id").val() },
+      }).done(function (msg) {
+        $("#result").append(JSON.stringify(msg));
       });
     });
   </script>
